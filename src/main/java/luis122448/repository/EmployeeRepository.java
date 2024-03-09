@@ -1,2 +1,4 @@
-package luis122448.repository;public interface EmployeeRepository {
+package luis122448.repository;
+
+public interface EmployeeRepository {
 }
