@@ -8,6 +8,7 @@ public class EmployeeModel {
     private String maSurname;
     private String email;
     private Float salary;
+    private String curp;
 
     public EmployeeModel() {
     }
@@ -79,5 +80,13 @@ public class EmployeeModel {
                 ", email='" + email + '\'' +
                 ", salary=" + salary +
                 '}';
+    }
+
+    public String getCurp() {
+        return curp;
+    }
+
+    public void setCurp(String curp) {
+        this.curp = curp;
     }
 }

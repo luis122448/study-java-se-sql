@@ -10,14 +10,20 @@ import java.util.List;
 
 public class EmployeeRepositoryImpl implements EmployeeRepository<EmployeeModel,Integer> {
 
-    private Connection getConnection() throws SQLException {
+    private final Connection connection;
+
+    public EmployeeRepositoryImpl(Connection connection) {
+        this.connection = connection;
+    }
+
+    private Connection getInstance() throws SQLException {
         return DataBaseConnection.getInstance();
     }
 
     @Override
     public List<EmployeeModel> findAll() throws SQLException {
         List<EmployeeModel> employees = new ArrayList<>();
-        try(Statement statement = getConnection().createStatement();){
+        try(Statement statement = connection.createStatement();){
             statement.executeQuery("SELECT * FROM employees");
             while(statement.getResultSet().next()){
                 employees.add(createEmployee(statement.getResultSet()));
@@ -29,7 +35,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepository<EmployeeModel,
     @Override
     public EmployeeModel findById(Integer integer) throws SQLException {
         EmployeeModel employee = null;
-        try(PreparedStatement statement = getConnection().prepareStatement("SELECT * FROM employees WHERE id = ?");){
+        String sql = "SELECT * FROM employees WHERE id = ?";
+        try(PreparedStatement statement = connection.prepareStatement(sql);){
             statement.setInt(1, integer);
             statement.executeQuery();
             if(statement.getResultSet().next()){
@@ -40,18 +47,39 @@ public class EmployeeRepositoryImpl implements EmployeeRepository<EmployeeModel,
     }
 
     @Override
-    public void save(EmployeeModel employeeModel) {
-
+    public void save(EmployeeModel employeeModel) throws SQLException {
+        String sql = "INSERT INTO employees (first_name, pa_surname, ma_surname, email, salary) VALUES (?,?,?,?,?)";
+        try(PreparedStatement statement = connection.prepareStatement(sql);){
+            statement.setString(1, employeeModel.getFirstName());
+            statement.setString(2, employeeModel.getPaSurname());
+            statement.setString(3, employeeModel.getMaSurname());
+            statement.setString(4, employeeModel.getEmail());
+            statement.setFloat(5, employeeModel.getSalary());
+            statement.executeUpdate();
+        }
     }
 
     @Override
-    public void update(EmployeeModel employeeModel) {
-
+    public void update(EmployeeModel employeeModel) throws SQLException {
+        String sql = "UPDATE employees SET first_name = ?, pa_surname = ?, ma_surname = ?, email = ?, salary = ? WHERE id = ?";
+        try(PreparedStatement statement = connection.prepareStatement(sql);){
+            statement.setString(1, employeeModel.getFirstName());
+            statement.setString(2, employeeModel.getPaSurname());
+            statement.setString(3, employeeModel.getMaSurname());
+            statement.setString(4, employeeModel.getEmail());
+            statement.setFloat(5, employeeModel.getSalary());
+            statement.setInt(6, employeeModel.getId());
+            statement.executeUpdate();
+        }
     }
 
     @Override
-    public void delete(Integer integer) {
-
+    public void delete(Integer integer) throws SQLException {
+        String sql = "DELETE FROM employees WHERE id = ?";
+        try(PreparedStatement statement = connection.prepareStatement(sql);){
+            statement.setInt(1, integer);
+            statement.executeUpdate();
+        }
     }
 
     public EmployeeModel createEmployee(ResultSet resultSet) throws SQLException{
