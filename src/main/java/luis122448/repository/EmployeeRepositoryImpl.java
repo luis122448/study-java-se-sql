@@ -3,27 +3,21 @@ package luis122448.repository;
 import luis122448.model.EmployeeModel;
 import luis122448.util.DataBaseConnection;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeRepositoryImpl implements EmployeeRepository<EmployeeModel,Integer> {
 
-    private final Connection connection;
-
-    public EmployeeRepositoryImpl(Connection connection) {
-        this.connection = connection;
-    }
-
-    private Connection getInstance() throws SQLException {
-        return DataBaseConnection.getInstance();
+    private Connection getConnection() throws SQLException {
+        return DataBaseConnection.getConnection();
     }
 
     @Override
     public List<EmployeeModel> findAll() throws SQLException {
         List<EmployeeModel> employees = new ArrayList<>();
-        try(Statement statement = connection.createStatement();){
+        try(Connection connection = getConnection();
+            Statement statement = connection.createStatement();){
             statement.executeQuery("SELECT * FROM employees");
             while(statement.getResultSet().next()){
                 employees.add(createEmployee(statement.getResultSet()));
@@ -36,7 +30,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepository<EmployeeModel,
     public EmployeeModel findById(Integer integer) throws SQLException {
         EmployeeModel employee = null;
         String sql = "SELECT * FROM employees WHERE id = ?";
-        try(PreparedStatement statement = connection.prepareStatement(sql);){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);){
             statement.setInt(1, integer);
             statement.executeQuery();
             if(statement.getResultSet().next()){
@@ -49,7 +44,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepository<EmployeeModel,
     @Override
     public void save(EmployeeModel employeeModel) throws SQLException {
         String sql = "INSERT INTO employees (first_name, pa_surname, ma_surname, email, salary) VALUES (?,?,?,?,?)";
-        try(PreparedStatement statement = connection.prepareStatement(sql);){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);){
             statement.setString(1, employeeModel.getFirstName());
             statement.setString(2, employeeModel.getPaSurname());
             statement.setString(3, employeeModel.getMaSurname());
@@ -62,7 +58,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepository<EmployeeModel,
     @Override
     public void update(EmployeeModel employeeModel) throws SQLException {
         String sql = "UPDATE employees SET first_name = ?, pa_surname = ?, ma_surname = ?, email = ?, salary = ? WHERE id = ?";
-        try(PreparedStatement statement = connection.prepareStatement(sql);){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);){
             statement.setString(1, employeeModel.getFirstName());
             statement.setString(2, employeeModel.getPaSurname());
             statement.setString(3, employeeModel.getMaSurname());
@@ -76,7 +73,8 @@ public class EmployeeRepositoryImpl implements EmployeeRepository<EmployeeModel,
     @Override
     public void delete(Integer integer) throws SQLException {
         String sql = "DELETE FROM employees WHERE id = ?";
-        try(PreparedStatement statement = connection.prepareStatement(sql);){
+        try(Connection connection = getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);){
             statement.setInt(1, integer);
             statement.executeUpdate();
         }

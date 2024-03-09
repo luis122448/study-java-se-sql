@@ -9,8 +9,7 @@ import java.sql.*;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
-        try(Connection connection = DataBaseConnection.getInstance();){
-            EmployeeRepository<EmployeeModel,Integer> repository = new EmployeeRepositoryImpl(connection);
+            EmployeeRepository<EmployeeModel,Integer> repository = new EmployeeRepositoryImpl();
             System.out.println("List of employees: "+repository.findAll());
             System.out.println("Employee with id 1: "+repository.findById(1));
 
@@ -33,6 +32,5 @@ public class Main {
 //            System.out.println("Deleting employee with id 6");
 //            repository.delete(6);
 //            System.out.println("List of employees: "+repository.findAll());
-        }
     }
 }
